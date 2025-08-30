@@ -1,0 +1,91 @@
+[
+  {
+    "id": "4a144fa1-8b6c-452f-92ce-dfdd89d24b9c",
+    "email": "demo1@example.com",
+    "phone": null,
+    "googleId": null,
+    "username": "demoUser",
+    "password": "$2b$10$61HQOfMx.O6zZ5njeBl93.q0gk0WFCrZq6DAwlJbcW/XQCATnEEV2",
+    "gender": "Nam",
+    "birthdate": "2001-05-21",
+    "createdAt": "2025-07-18T09:46:54.018Z"
+  },
+  {
+    "id": "24e423dd-96b0-4e01-899e-2c080a9ef76d",
+    "email": "demo2@example.com",
+    "phone": null,
+    "googleId": null,
+    "username": "demoUser",
+    "password": "$2b$10$Ra65HREixRfwB.MOFNDbUuK/5ncmpHeq4BopYlApzuwnKMdILaV.m",
+    "gender": "Nam",
+    "birthdate": "2001-05-21",
+    "createdAt": "2025-07-18T09:47:05.933Z"
+  },
+  {
+    "id": "8be692c6-dd24-4ed2-b42e-a33b16bed976",
+    "email": "demo3@example.com",
+    "phone": null,
+    "googleId": null,
+    "username": "demoUser",
+    "password": "$2b$10$P6CXVbxUqB7VRy4ujCauxuLT.GNpzLLjLAGrJ50nP3ieBq/C09pqq",
+    "gender": "Nam",
+    "birthdate": null,
+    "createdAt": "2025-07-18T09:47:43.013Z"
+  },
+  {
+    "id": "dd0d7adb-da4c-4535-8e07-3f5e633a62e3",
+    "email": "demo4@example.com",
+    "phone": null,
+    "googleId": null,
+    "username": "demoUser",
+    "password": "$2b$10$64.1JfFsIH9C2zhNrU/fHO90W.WdZxaiRUFIv3fCMh0IgKhQA.0lG",
+    "gender": "Không muốn nêu cụ thể",
+    "birthdate": null,
+    "createdAt": "2025-07-18T09:48:11.482Z"
+  },
+  {
+    "id": "1b010425-0394-406e-96a1-75fa9a4ad2de",
+    "email": "demo6@example.com",
+    "phone": null,
+    "googleId": null,
+    "username": "demoUser",
+    "password": "$2b$10$qkl3LwfByFJ13n6Rcnu8WeZPWNNZtCx8iBNqxZK9aHxYt34JhsOna",
+    "gender": null,
+    "birthdate": "2001-05-21",
+    "createdAt": "2025-07-18T09:54:48.109Z"
+  },
+  {
+    "id": "55efc7d5-fdb2-431e-9157-b0ad4de3b5bf",
+    "email": "test1@gmail.com",
+    "username": "test1",
+    "gender": "male",
+    "birthdate": "2000-01-01",
+    "password": "$2b$10$qhnys0gMDOITwBZwUUqxsubu87d1q0PNjUwr8OCisi5XiTF9W59S.",
+    "likedSongs": [
+      "ecfed5c5-4f51-4867-b6a6-8ca4c2d8ee27",
+      "b89fa758-71e7-4d60-b792-f433b88441cc"
+    ]
+  },
+  {
+    "id": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "email": "dinhbinh1612@gmail.com",
+    "username": "dinhbinh",
+    "gender": "male",
+    "birthdate": "2000-01-01",
+    "password": "$2b$10$LdpN5ErZhVVftm/ZkmdmA.8KHWwNgvO5GiJVIf/hfIwy3k0DXnis2",
+    "likedSongs": [
+      "ecfed5c5-4f51-4867-b6a6-8ca4c2d8ee27",
+      "b89fa758-71e7-4d60-b792-f433b88441cc"
+    ],
+    "avatar": "/uploads/avatar/f5eec3bf-122a-48a6-a8c3-5674fea0cf84.jpg"
+  },
+  {
+    "id": "b6b97d10-c4bb-4440-8476-5f9c3aea5303",
+    "email": "phambinh1612@gmail.com",
+    "username": "dinhbinh",
+    "gender": "Nam",
+    "birthdate": "1/01/2000",
+    "password": "$2b$10$b7Vue8m3lUjxbWGpbBIACeb6ZdaAgKmAKahxCMxMN5KmTr8eYhbKq",
+    "likedSongs": []
+  }
+]
