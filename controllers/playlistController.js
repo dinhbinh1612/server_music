@@ -1,87 +1,97 @@
 const playlistService = require("../services/playlistService");
 
-exports.createPlaylist = (req, res) => {
+exports.createPlaylist = async (req, res) => {
   try {
     const userId = req.user.id;
     const { name } = req.body;
 
-    const playlist = playlistService.createPlaylist(userId, name);
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Playlist name is required" });
+    }
+
+    const playlist = await playlistService.createPlaylist(userId, name.trim());
     res.status(201).json(playlist);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.getUserPlaylists = (req, res) => {
+exports.getUserPlaylists = async (req, res) => {
   try {
     const userId = req.user.id;
-    const playlists = playlistService.getUserPlaylists(userId);
+    const playlists = await playlistService.getUserPlaylists(userId);
     res.json(playlists);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.addSongToPlaylist = (req, res) => {
+exports.addSongToPlaylist = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
     const { songId } = req.body;
 
-    const playlist = playlistService.addSongToPlaylist(userId, id, songId);
+    if (!songId) {
+      return res.status(400).json({ message: "Song ID is required" });
+    }
+
+    const playlist = await playlistService.addSongToPlaylist(userId, id, songId);
     res.json(playlist);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.removeSongFromPlaylist = (req, res) => {
+exports.removeSongFromPlaylist = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id, songId } = req.params;
 
-    const playlist = playlistService.removeSongFromPlaylist(userId, id, songId);
+    const playlist = await playlistService.removeSongFromPlaylist(userId, id, songId);
     res.json(playlist);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.getPlaylistById = (req, res) => {
+exports.getPlaylistById = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
 
-    const playlist = playlistService.getPlaylistById(userId, id);
+    const playlist = await playlistService.getPlaylistById(userId, id);
     res.json(playlist);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.renamePlaylist = (req, res) => {
+exports.renamePlaylist = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
     const { name } = req.body;
 
-    const playlist = playlistService.renamePlaylist(userId, id, name);
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Playlist name is required" });
+    }
+
+    const playlist = await playlistService.renamePlaylist(userId, id, name.trim());
     res.json(playlist);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-exports.deletePlaylist = (req, res) => {
+exports.deletePlaylist = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
 
-    const result = playlistService.deletePlaylist(userId, id);
+    const result = await playlistService.deletePlaylist(userId, id);
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-
-// Playlist Controller

@@ -1,4 +1,3 @@
-// routes/authRoutes.js
 const express = require("express");
 const router = express.Router();
 const {
@@ -22,3 +21,5 @@ router.post("/google-login", googleLogin);
 router.get("/profile", authMiddleware, profile);
 
 module.exports = router;
+
+// routes/authRoutes.js

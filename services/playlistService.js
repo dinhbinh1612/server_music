@@ -1,66 +1,149 @@
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const { initDB } = require("../core/initDB");
 
 const USERS_FILE = path.join(__dirname, "../db/users.json");
-const PLAYLISTS_FILE = path.join(__dirname, "../db/playlist.json");
-const SONGS_FILE = path.join(__dirname, "../db/song.json");
+const PLAYLISTS_FILE = path.join(__dirname, "../db/playlists.json");
+const SONGS_FILE = path.join(__dirname, "../db/songs.json");
+
+let playlistsDB, usersDB, songsDB;
+
+async function initializeDatabases() {
+  try {
+    const dbs = await initDB();
+    playlistsDB = dbs.playlistsDB;
+    usersDB = dbs.usersDB;
+    songsDB = dbs.songsDB;
+  } catch (error) {
+    console.error("Failed to initialize databases:", error);
+    throw error;
+  }
+}
+
+async function ensureDBs() {
+  if (!playlistsDB || !usersDB || !songsDB) {
+    await initializeDatabases();
+  }
+  await Promise.all([playlistsDB.read(), usersDB.read(), songsDB.read()]);
+}
 
 // ======= Helper =======
 function readUsers() {
-  return JSON.parse(fs.readFileSync(USERS_FILE));
+  return usersDB.data || [];
 }
 
 function writeUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  usersDB.data = users;
+  return usersDB.write();
 }
 
 function readPlaylists() {
-  if (!fs.existsSync(PLAYLISTS_FILE))
-    fs.writeFileSync(PLAYLISTS_FILE, JSON.stringify([]));
-  return JSON.parse(fs.readFileSync(PLAYLISTS_FILE));
+  return playlistsDB.data || [];
 }
 
 function writePlaylists(playlists) {
-  fs.writeFileSync(PLAYLISTS_FILE, JSON.stringify(playlists, null, 2));
+  playlistsDB.data = playlists;
+  return playlistsDB.write();
 }
 
 function readSongs() {
-  return JSON.parse(fs.readFileSync(SONGS_FILE));
+  return songsDB.data.songs || [];
 }
 
 // ======= Service =======
 module.exports = {
-  createPlaylist: (userId, name) => {
+  createPlaylist: async (userId, name) => {
+    await ensureDBs();
+
     const users = readUsers();
     const user = users.find((u) => u.id === userId);
     if (!user) throw new Error("User not found");
 
     const playlists = readPlaylists();
 
+    // Check for duplicate playlist name for this user
+    const duplicate = playlists.find(
+      (p) => p.userId === userId && p.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (duplicate) {
+      throw new Error("Danh sach phát lại với tên này đã tồn tại");
+    }
+
     const newPlaylist = {
       id: uuidv4(),
       name,
-      userId, // liên kết với user
+      userId,
       songs: [],
       createdAt: new Date(),
     };
 
     playlists.push(newPlaylist);
-    writePlaylists(playlists);
+    await writePlaylists(playlists);
 
     return newPlaylist;
   },
 
-  getUserPlaylists: (userId) => {
+  getUserPlaylists: async (userId) => {
+    await ensureDBs();
     const playlists = readPlaylists();
-    return playlists.filter((p) => p.userId === userId);
+    const songs = readSongs();
+
+    const userPlaylists = playlists.filter((p) => p.userId === userId);
+
+    return userPlaylists.map((playlist) => {
+      const playlistSongs = songs.filter((song) =>
+        playlist.songs.includes(song.id)
+      );
+      return {
+        ...playlist,
+        songs: playlistSongs,
+        songCount: playlistSongs.length, //  tổng số bài hát
+      };
+    });
   },
 
-  addSongToPlaylist: (userId, playlistId, songId) => {
+  createPlaylist: async (userId, name) => {
+    await ensureDBs();
+
+    const users = readUsers();
+    const user = users.find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+
     const playlists = readPlaylists();
-    const songsData = readSongs(); // lấy ra object
-    const songs = songsData.songs; // lấy mảng thực sự
+
+    // Check for duplicate playlist name for this user
+    const duplicate = playlists.find(
+      (p) => p.userId === userId && p.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (duplicate) {
+      throw new Error("Bạn đã có danh sách phát với tên này");
+    }
+
+    const newPlaylist = {
+      id: uuidv4(),
+      name,
+      userId,
+      songs: [],
+      createdAt: new Date(),
+    };
+
+    playlists.push(newPlaylist);
+    await writePlaylists(playlists);
+
+    // Return the playlist with empty songs array
+    return {
+      ...newPlaylist,
+      songs: [], // Explicitly include empty songs array
+    };
+  },
+
+  addSongToPlaylist: async (userId, playlistId, songId) => {
+    await ensureDBs();
+    const playlists = readPlaylists();
+    const songs = readSongs();
 
     const playlist = playlists.find(
       (p) => p.id === playlistId && p.userId === userId
@@ -70,65 +153,115 @@ module.exports = {
     const song = songs.find((s) => s.id === songId);
     if (!song) throw new Error("Song not found");
 
-    if (!playlist.songs.includes(songId)) {
-      playlist.songs.push(songId);
-      writePlaylists(playlists);
+    // Check if song already exists in playlist
+    if (playlist.songs.includes(songId)) {
+      throw new Error("Song already exists in this playlist");
     }
 
-    return playlist;
-  },
+    playlist.songs.push(songId);
+    await writePlaylists(playlists);
 
-  removeSongFromPlaylist: (userId, playlistId, songId) => {
-    const playlists = readPlaylists();
-
-    const playlist = playlists.find(
-      (p) => p.id === playlistId && p.userId === userId
-    );
-    if (!playlist) throw new Error("Playlist not found");
-
-    playlist.songs = playlist.songs.filter((id) => id !== songId);
-    writePlaylists(playlists);
-
-    return playlist;
-  },
-
-  getPlaylistById: (userId, playlistId) => {
-    const playlists = readPlaylists();
-    const songsData = readSongs();
-    const songs = songsData.songs;
-
-    const playlist = playlists.find(
-      (p) => p.id === playlistId && p.userId === userId
-    );
-    if (!playlist) throw new Error("Playlist not found");
-
+    // Return the playlist with populated song details
     return {
       ...playlist,
-      songs: songs.filter((song) => playlist.songs.includes(song.id)),
+      songs: songs.filter((s) => playlist.songs.includes(s.id)),
     };
   },
 
-  renamePlaylist: (userId, playlistId, newName) => {
+  removeSongFromPlaylist: async (userId, playlistId, songId) => {
+    await ensureDBs();
+
     const playlists = readPlaylists();
+    const songs = readSongs();
 
     const playlist = playlists.find(
       (p) => p.id === playlistId && p.userId === userId
     );
     if (!playlist) throw new Error("Playlist not found");
 
-    playlist.name = newName;
-    writePlaylists(playlists);
+    // Check if song exists in playlist
+    if (!playlist.songs.includes(songId)) {
+      throw new Error("Song not found in this playlist");
+    }
 
-    return playlist;
+    playlist.songs = playlist.songs.filter((id) => id !== songId);
+    await writePlaylists(playlists);
+
+    // Return the playlist with updated song details
+    return {
+      ...playlist,
+      songs: songs.filter((s) => playlist.songs.includes(s.id)),
+    };
   },
 
-  deletePlaylist: (userId, playlistId) => {
+  getPlaylistById: async (userId, playlistId) => {
+    await ensureDBs();
+
+    const playlists = readPlaylists();
+    const songs = readSongs();
+
+    const playlist = playlists.find(
+      (p) => p.id === playlistId && p.userId === userId
+    );
+    if (!playlist) throw new Error("Playlist not found");
+
+    const playlistSongs = songs.filter((song) =>
+      playlist.songs.includes(song.id)
+    );
+
+    return {
+      ...playlist,
+      songs: playlistSongs,
+      songCount: playlistSongs.length,
+    };
+  },
+
+  renamePlaylist: async (userId, playlistId, newName) => {
+    await ensureDBs();
+    const playlists = readPlaylists();
+    const songs = readSongs();
+
+    const playlist = playlists.find(
+      (p) => p.id === playlistId && p.userId === userId
+    );
+    if (!playlist) throw new Error("Playlist not found");
+
+    // Check for duplicate playlist name for this user (excluding current playlist)
+    const duplicate = playlists.find(
+      (p) =>
+        p.userId === userId &&
+        p.id !== playlistId &&
+        p.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    if (duplicate) {
+      throw new Error("You already have a playlist with this name");
+    }
+
+    playlist.name = newName;
+    await writePlaylists(playlists);
+
+    // Return the playlist with song details
+    return {
+      ...playlist,
+      songs: songs.filter((s) => playlist.songs.includes(s.id)),
+    };
+  },
+
+  deletePlaylist: async (userId, playlistId) => {
+    await ensureDBs();
     let playlists = readPlaylists();
 
-    playlists = playlists.filter(
-      (p) => !(p.id === playlistId && p.userId === userId)
+    const playlistIndex = playlists.findIndex(
+      (p) => p.id === playlistId && p.userId === userId
     );
-    writePlaylists(playlists);
+
+    if (playlistIndex === -1) {
+      throw new Error("Playlist not found");
+    }
+
+    playlists.splice(playlistIndex, 1);
+    await writePlaylists(playlists);
 
     return { message: "Playlist deleted successfully" };
   },

@@ -1,73 +1,92 @@
-const fs = require("fs");
-const path = require("path");
+const { initDB } = require("../core/initDB");
 
-const USERS_FILE = path.join(__dirname, "../db/users.json");
-const SONGS_FILE = path.join(__dirname, "../db/song.json");
+let usersDB, songsDB;
 
-// --- Users ---
-function readUsers() {
-  if (!fs.existsSync(USERS_FILE)) return [];
-  return JSON.parse(fs.readFileSync(USERS_FILE));
+async function ensureDBs() {
+  if (!usersDB || !songsDB) {
+    const dbs = await initDB();
+    usersDB = dbs.usersDB;
+    songsDB = dbs.songsDB;
+  }
+  await Promise.all([usersDB.read(), songsDB.read()]);
 }
 
-function writeUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+async function readUsers() {
+  await ensureDBs();
+  return usersDB.data || [];
 }
 
-// --- Songs ---
-function readSongs() {
-  if (!fs.existsSync(SONGS_FILE)) return { songs: [] };
-  return JSON.parse(fs.readFileSync(SONGS_FILE));
+async function writeUsers(users) {
+  await ensureDBs();
+  usersDB.data = users;
+  return usersDB.write();
 }
 
-function writeSongs(songs) {
-  fs.writeFileSync(SONGS_FILE, JSON.stringify({ songs }, null, 2));
+async function readSongs() {
+  await ensureDBs();
+  return songsDB.data.songs || [];
+}
+
+// Like/Unlike song
+async function toggleLikeSong(userId, songId) {
+  const users = await readUsers();
+  const songs = await readSongs();
+
+  const user = users.find((u) => u.id === userId);
+  if (!user) throw new Error("User not found");
+
+  if (!user.likedSongs) user.likedSongs = [];
+
+  const song = songs.find((s) => s.id === songId);
+  if (!song) throw new Error("Song not found");
+
+  const index = user.likedSongs.indexOf(songId);
+  if (index === -1) {
+    user.likedSongs.push(songId);
+    song.likeCount = (song.likeCount || 0) + 1;
+  } else {
+    user.likedSongs.splice(index, 1);
+    song.likeCount = Math.max(0, (song.likeCount || 1) - 1);
+  }
+
+  await writeUsers(users);
+  songsDB.data.songs = songs;
+  await songsDB.write();
+
+  return { likedSongs: user.likedSongs, song };
+}
+
+// Lấy danh sách nhạc đã like (có phân trang)
+async function getLikedSongs(userId, page = 1, limit = 20) {
+  const users = await readUsers();
+  const songs = await readSongs();
+
+  const user = users.find((u) => u.id === userId);
+  if (!user) throw new Error("User not found");
+
+  const likedSongs = songs.filter((s) => user.likedSongs?.includes(s.id));
+
+  // Sắp xếp mới nhất trước
+  likedSongs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const total = likedSongs.length;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    songs: likedSongs.slice(startIndex, endIndex),
+  };
 }
 
 module.exports = {
-  // Xuất luôn ra để controller xài
+  toggleLikeSong,
+  getLikedSongs,
   readUsers,
   writeUsers,
-
-  // Like/unlike song
-  toggleLikeSong: (userId, songId) => {
-    const users = readUsers();
-    const songsData = readSongs();
-    const songs = songsData.songs;
-
-    const user = users.find((u) => u.id === userId);
-    if (!user) throw new Error("User not found");
-
-    if (!user.likedSongs) user.likedSongs = [];
-
-    const song = songs.find((s) => s.id === songId);
-    if (!song) throw new Error("Song not found");
-
-    const index = user.likedSongs.indexOf(songId);
-    if (index === -1) {
-      user.likedSongs.push(songId);
-      song.likeCount = (song.likeCount || 0) + 1;
-    } else {
-      user.likedSongs.splice(index, 1);
-      song.likeCount = Math.max(0, (song.likeCount || 1) - 1);
-    }
-
-    writeUsers(users);
-    writeSongs(songs);
-
-    return { likedSongs: user.likedSongs, song };
-  },
-
-  getLikedSongs: (userId) => {
-    const users = readUsers();
-    const songsData = readSongs();
-    const songs = songsData.songs;
-
-    const user = users.find((u) => u.id === userId);
-    if (!user) throw new Error("User not found");
-
-    return songs.filter((song) => user.likedSongs?.includes(song.id));
-  },
 };
 
-// User Service
+// userService.js

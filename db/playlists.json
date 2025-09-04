@@ -1,0 +1,55 @@
+[
+  {
+    "id": "62142dcb-34e2-46b0-b925-1b1b3cf229ab",
+    "name": "Nhạc của bạn",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [
+      "9828261d-2553-4b3d-b803-2cf881fc02a7",
+      "57f1a8a4-dee1-4099-bd6f-6ec9fdc33cff",
+      "22b4eb81-417f-457d-8cca-f83d24969cc7"
+    ],
+    "createdAt": "2025-09-04T02:53:23.750Z"
+  },
+  {
+    "id": "a00f9e33-ebb9-4db9-bdc8-5c94950d74bb",
+    "name": "ahihi",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [
+      "58941916-f343-4e39-a7c0-5b0d9af56b5a",
+      "6e46042e-c0da-41ef-a27b-582939bf3b97"
+    ],
+    "createdAt": "2025-09-04T03:08:23.506Z"
+  },
+  {
+    "id": "12755498-5273-4d8f-b161-a3aa59c8d181",
+    "name": "hay hay",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [],
+    "createdAt": "2025-09-04T07:31:52.361Z"
+  },
+  {
+    "id": "b36750d6-7e31-4eed-a5b2-f5d8dacd57e9",
+    "name": "mh",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [
+      "22b4eb81-417f-457d-8cca-f83d24969cc7"
+    ],
+    "createdAt": "2025-09-04T07:33:14.372Z"
+  },
+  {
+    "id": "7afaf94a-5c71-48c5-acd4-9891f5da1874",
+    "name": "hayhay",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [],
+    "createdAt": "2025-09-04T07:34:13.271Z"
+  },
+  {
+    "id": "3cbf85c1-5c71-4fbb-98ab-e4dec5666905",
+    "name": "kaka",
+    "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+    "songs": [
+      "ba8f5da1-3b4c-4d9f-a292-e2bec595b9f5"
+    ],
+    "createdAt": "2025-09-04T07:37:19.126Z"
+  }
+]

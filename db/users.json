@@ -74,8 +74,20 @@
     "birthdate": "2000-01-01",
     "password": "$2b$10$LdpN5ErZhVVftm/ZkmdmA.8KHWwNgvO5GiJVIf/hfIwy3k0DXnis2",
     "likedSongs": [
+      "b89fa758-71e7-4d60-b792-f433b88441cc",
+      "b05a139a-3791-4c46-81bf-d5d250d61b84",
+      "cb64685c-c75e-4fde-84bb-7d4eac572c4e",
+      "61b488fb-78e6-407f-b2b7-930aebe17c95",
+      "bd5e53fe-6afa-4f2d-a05e-02b13de20c51",
       "ecfed5c5-4f51-4867-b6a6-8ca4c2d8ee27",
-      "b89fa758-71e7-4d60-b792-f433b88441cc"
+      "9828261d-2553-4b3d-b803-2cf881fc02a7",
+      "21b8ed9b-6347-4de0-87ba-d01df8ddba95",
+      "c3c8ead0-0234-4d60-bcce-8cdc85861183",
+      "ba8f5da1-3b4c-4d9f-a292-e2bec595b9f5",
+      "a715f129-fef7-422c-8c9d-adb4d4242054",
+      "037c9732-2b9b-4637-bc85-7aab94b93d0f",
+      "6e46042e-c0da-41ef-a27b-582939bf3b97",
+      "5f00b589-c577-44ab-a5f7-6dcb9fe5a150"
     ],
     "avatar": "/uploads/avatar/f5eec3bf-122a-48a6-a8c3-5674fea0cf84.jpg"
   },
@@ -86,6 +98,34 @@
     "gender": "Nam",
     "birthdate": "1/01/2000",
     "password": "$2b$10$b7Vue8m3lUjxbWGpbBIACeb6ZdaAgKmAKahxCMxMN5KmTr8eYhbKq",
+    "likedSongs": []
+  },
+  {
+    "id": "d4cdab98-ba80-4c84-b26b-b232e5e72540",
+    "email": "dinhbinh16124@gmail.com",
+    "username": "dinhbinh",
+    "gender": "male",
+    "birthdate": "2000-01-01",
+    "password": "$2b$10$l3dj4ypmgmJZakfbLykiduXVvrqTbXIqJzh1jMCOm3SVpNqjAFbuW",
+    "likedSongs": []
+  },
+  {
+    "id": "a94307e3-1c7a-439b-b584-e9caa066f026",
+    "email": "dinhbinh4521@gmail.com",
+    "username": "dinhbinh",
+    "gender": "male",
+    "birthdate": "2000-01-01",
+    "password": "$2b$10$owmqYXPlyMwmFIYoKEx7Uuyy8RQKIT4LnWmYJZnHeTd/x.4O77Xjy",
+    "likedSongs": [],
+    "avatar": "/uploads/avatar/a94307e3-1c7a-439b-b584-e9caa066f026.webp"
+  },
+  {
+    "id": "b76a4263-5fd9-4567-9036-8b5fff88d91a",
+    "email": "dinhbinh2@gmail.com",
+    "username": "dinhbinh",
+    "gender": "male",
+    "birthdate": "2000-01-01",
+    "password": "$2b$10$KXKyNK6xTOxbKXSmXmPCCOYqfxA0Nl4QgUlOucv.h/jkzbLGqV4Pa",
     "likedSongs": []
   }
 ]

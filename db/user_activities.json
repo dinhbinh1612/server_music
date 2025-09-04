@@ -1,0 +1,117 @@
+{
+  "playHistory": [
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "21b8ed9b-6347-4de0-87ba-d01df8ddba95",
+      "playedAt": "2025-09-03T09:25:59.272Z",
+      "duration": 254,
+      "timestamp": 1756891559272
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "9828261d-2553-4b3d-b803-2cf881fc02a7",
+      "playedAt": "2025-09-04T09:51:09.110Z",
+      "duration": 292,
+      "timestamp": 1756979469110
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "c3c8ead0-0234-4d60-bcce-8cdc85861183",
+      "playedAt": "2025-09-03T09:22:23.578Z",
+      "duration": 156,
+      "timestamp": 1756891343578
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "ba8f5da1-3b4c-4d9f-a292-e2bec595b9f5",
+      "playedAt": "2025-09-04T07:38:28.563Z",
+      "duration": 219,
+      "timestamp": 1756971508563
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "bd5e53fe-6afa-4f2d-a05e-02b13de20c51",
+      "playedAt": "2025-09-03T09:28:25.694Z",
+      "duration": 309,
+      "timestamp": 1756891705694
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "cb64685c-c75e-4fde-84bb-7d4eac572c4e",
+      "playedAt": "2025-09-03T08:51:21.434Z",
+      "duration": 314,
+      "timestamp": 1756889481434
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "58941916-f343-4e39-a7c0-5b0d9af56b5a",
+      "playedAt": "2025-09-04T09:12:38.674Z",
+      "duration": 231,
+      "timestamp": 1756977158674
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "a715f129-fef7-422c-8c9d-adb4d4242054",
+      "playedAt": "2025-09-03T08:48:30.281Z",
+      "duration": 249,
+      "timestamp": 1756889310281
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "93d92c58-e2ae-44d0-b492-9bf7161a5421",
+      "playedAt": "2025-09-03T08:58:05.911Z",
+      "duration": 249,
+      "timestamp": 1756889885911
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "ecfed5c5-4f51-4867-b6a6-8ca4c2d8ee27",
+      "playedAt": "2025-09-04T07:42:33.494Z",
+      "duration": 0,
+      "timestamp": 1756971753494
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "037c9732-2b9b-4637-bc85-7aab94b93d0f",
+      "playedAt": "2025-09-04T09:16:39.089Z",
+      "duration": 263,
+      "timestamp": 1756977399089
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "6e46042e-c0da-41ef-a27b-582939bf3b97",
+      "playedAt": "2025-09-04T09:21:24.970Z",
+      "duration": 335,
+      "timestamp": 1756977684970
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "5f00b589-c577-44ab-a5f7-6dcb9fe5a150",
+      "playedAt": "2025-09-04T08:15:48.731Z",
+      "duration": 156,
+      "timestamp": 1756973748731
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "61b488fb-78e6-407f-b2b7-930aebe17c95",
+      "playedAt": "2025-09-03T15:18:13.084Z",
+      "duration": 302,
+      "timestamp": 1756912693084
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "6c45b65d-c251-4358-83b9-91287ac5836c",
+      "playedAt": "2025-09-04T08:25:04.287Z",
+      "duration": 262,
+      "timestamp": 1756974304287
+    },
+    {
+      "userId": "f5eec3bf-122a-48a6-a8c3-5674fea0cf84",
+      "songId": "22b4eb81-417f-457d-8cca-f83d24969cc7",
+      "playedAt": "2025-09-04T08:38:16.288Z",
+      "duration": 350,
+      "timestamp": 1756975096288
+    }
+  ],
+  "userPreferences": {}
+}

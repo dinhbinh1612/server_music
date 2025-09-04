@@ -2,32 +2,44 @@ const fs = require("fs");
 const path = require("path");
 const userService = require("../services/userService");
 
-// Like/Unlike Song
-exports.likeSong = (req, res) => {
+// Like/unlike song
+exports.likeSong = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { id } = req.params;
+    const songId = req.params.id;
+    const result = await userService.toggleLikeSong(userId, songId);
 
-    const result = userService.toggleLikeSong(userId, id);
-    res.json(result);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.json({
+      success: true,
+      message: "Song like/unlike updated",
+      data: result,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
-// Get liked songs
-exports.getLikedSongs = (req, res) => {
+// Lấy danh sách nhạc đã thích
+exports.getLikedSongs = async (req, res) => {
   try {
     const userId = req.user.id;
-    const likedSongs = userService.getLikedSongs(userId);
-    res.json(likedSongs);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const likedSongs = await userService.getLikedSongs(userId, page, limit);
+
+    res.json({
+      success: true,
+      data: likedSongs,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
-// Upload Avatar (có xoá avatar cũ)
-exports.uploadAvatar = (req, res) => {
+// Upload Avatar (xoá avatar cũ)
+exports.uploadAvatar = async (req, res) => {
+  // THÊM async
   try {
     if (!req.files || !req.files.avatar) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -42,8 +54,8 @@ exports.uploadAvatar = (req, res) => {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
 
-    // Lấy users + user hiện tại
-    const users = userService.readUsers();
+    // Lấy users + user hiện tại - SỬA ĐOẠN NÀY
+    const users = await userService.readUsers(); // THÊM await
     const user = users.find((u) => u.id === userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -61,14 +73,21 @@ exports.uploadAvatar = (req, res) => {
     const filePath = path.join(uploadPath, filename);
 
     // Lưu file mới
-    avatar.mv(filePath, (err) => {
+    avatar.mv(filePath, async (err) => {
+      // THÊM async
       if (err) return res.status(500).json({ message: "Error saving file" });
 
-      // Cập nhật user
+      // Cập nhật user - SỬA ĐOẠN NÀY
       user.avatar = `/uploads/avatar/${filename}`;
-      userService.writeUsers(users);
-
-      res.json({ message: "Avatar uploaded successfully", avatar: user.avatar });
+      try {
+        await userService.writeUsers(users); // THÊM await
+        res.json({
+          message: "Avatar uploaded successfully",
+          avatar: user.avatar,
+        });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

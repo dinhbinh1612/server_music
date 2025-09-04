@@ -1,14 +1,34 @@
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-const { JSONFilePreset } = require("lowdb/node");
+const mm = require("music-metadata");
+const { initDB } = require("../core/initDB");
 
-// file db/song.json thay vì db.json
+// file db/songs.json thay vì db.json
 const dbDir = path.join(__dirname, "..", "db");
-const dbFile = path.join(dbDir, "song.json");
+const dbFile = path.join(dbDir, "songs.json");
 const defaultData = { songs: [] };
 
 let db; // khởi tạo rỗng
+
+// Khởi tạo database
+async function initializeDatabase() {
+  try {
+    const { songsDB } = await initDB();
+    db = songsDB;
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+    throw error;
+  }
+}
+
+// Helper function để đảm bảo db đã được khởi tạo
+async function ensureDB() {
+  if (!db) {
+    await initializeDatabase();
+  }
+  await db.read(); // Luôn đọc lại data mới nhất
+}
 
 // helper đảm bảo folder tồn tại
 function ensureDirSync(dir) {
@@ -17,12 +37,6 @@ function ensureDirSync(dir) {
   }
 }
 
-async function initDB() {
-  ensureDirSync(dbDir); // tạo thư mục db nếu chưa có
-  db = await JSONFilePreset(dbFile, defaultData);
-}
-initDB(); // gọi khi khởi động app
-
 // helper để làm sạch tên file (bỏ ký tự đặc biệt, khoảng trắng thành _)
 function sanitizeFileName(name) {
   let clean = name.trim().replace(/\s+/g, "_");
@@ -30,16 +44,19 @@ function sanitizeFileName(name) {
   return clean;
 }
 
-const mm = require("music-metadata");
-
 exports.uploadSong = async (req) => {
+  await ensureDB();
   if (!db) throw new Error("Database not initialized yet");
 
-  const { title, artist } = req.body;
+  const { title, artist, genre } = req.body;
   const audioFile = req.files?.audio;
   const coverFile = req.files?.cover;
 
   if (!audioFile) throw new Error("Audio file is required");
+  if (!genre) throw new Error("Genre is required");
+  if (typeof genre !== "string" || genre.trim() === "") {
+    throw new Error("Genre must be a non-empty string");
+  }
 
   const songId = uuidv4();
   const safeTitle = sanitizeFileName(title);
@@ -60,7 +77,7 @@ exports.uploadSong = async (req) => {
   // cover
   let coverPath = coverFile
     ? `uploads/covers/${safeTitle}_${songId}${coverExt}`
-    : "/uploads/covers/default.jpg"; // ✅ default nếu null
+    : "/uploads/covers/default.jpg";
   if (coverFile) await coverFile.mv(path.join(__dirname, "..", coverPath));
 
   // duration
@@ -76,12 +93,15 @@ exports.uploadSong = async (req) => {
     id: songId,
     title,
     artist,
+    genre: genre.trim(), // Đảm bảo genre không có khoảng trắng thừa
     audioUrl: audioPath,
     coverUrl: coverPath,
     likeCount: 0,
     duration,
     createdAt: new Date(),
-    streamUrl: `http://192.168.1.191:3000/songs/stream/${songId}`, // ✅ streamUrl
+    streamUrl: `${
+      process.env.BASE_URL || "http://localhost:3000"
+    }/songs/stream/${songId}`,
   };
 
   db.data.songs.push(newSong);
@@ -91,17 +111,20 @@ exports.uploadSong = async (req) => {
 };
 
 exports.getSongs = async (page = 1, limit = 20) => {
+  await ensureDB();
+
   if (!db) throw new Error("Database not initialized yet");
 
   const songs = db.data.songs
     .map((s) => ({
       ...s,
       coverUrl: s.coverUrl || "/uploads/covers/default.jpg",
-      streamUrl: `http://192.168.1.191:3000/songs/stream/${s.id}`,
+      streamUrl: `${
+        process.env.BASE_URL || "http://localhost:3000"
+      }/songs/stream/${s.id}`,
     }))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt)); // mới nhất trước
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  // tính toán phân trang
   const total = songs.length;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
@@ -116,9 +139,8 @@ exports.getSongs = async (page = 1, limit = 20) => {
   };
 };
 
-
 exports.getSongById = async (id) => {
-  if (!db) throw new Error("Database not initialized yet");
+  await ensureDB(); // Thêm await ensureDB()
 
   const s = db.data.songs.find((s) => s.id === id);
   if (!s) return null;
@@ -126,14 +148,31 @@ exports.getSongById = async (id) => {
   return {
     ...s,
     coverUrl: s.coverUrl || "/uploads/covers/default.jpg",
-    streamUrl: `http://192.168.1.191:3000/songs/stream/${s.id}`,
+    streamUrl: `${
+      process.env.BASE_URL || "http://localhost:3000"
+    }/songs/stream/${s.id}`,
   };
 };
 
 exports.streamSong = async (req, res) => {
+  await ensureDB();
+
   if (!db) throw new Error("Database not initialized yet");
 
   const song = db.data.songs.find((s) => s.id === req.params.id);
+  if (!song) {
+    res.status(404).json({ error: "Song not found" });
+    return;
+  }
+
+  // Track lượt nghe (nếu có user đăng nhập)
+  if (req.user && req.user.id) {
+    const analyticsService = require("./analyticsService");
+    analyticsService
+      .trackPlay(req.user.id, song.id, song.duration || 0)
+      .catch((err) => console.error("Track play error:", err));
+  }
+
   if (!song) throw new Error("Song not found");
 
   const filePath = path.join(__dirname, "..", song.audioUrl);
@@ -164,6 +203,45 @@ exports.streamSong = async (req, res) => {
     });
     file.pipe(res);
   }
+};
+
+exports.searchSongs = async (query, page = 1, limit = 20) => {
+  await ensureDB();
+  if (!db) throw new Error("Database not initialized yet");
+
+  const normalizeVietnamese = (str) => {
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D");
+  };
+
+  let filteredSongs = db.data.songs;
+
+  if (query.trim() !== "") {
+    const searchTerm = normalizeVietnamese(query.trim());
+
+    filteredSongs = filteredSongs.filter((song) => {
+      if (!song.title || !song.artist) return false;
+      const title = normalizeVietnamese(song.title);
+      const artist = normalizeVietnamese(song.artist);
+      return title.includes(searchTerm) || artist.includes(searchTerm);
+    });
+  }
+
+  const total = filteredSongs.length;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    songs: filteredSongs.slice(startIndex, endIndex),
+  };
 };
 
 // songService.js
